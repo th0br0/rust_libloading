@@ -9,7 +9,9 @@
 
     <title>mod.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../../../../main.css">
+    
 
     
     
@@ -319,13 +321,14 @@
 <span class='kw'>use</span> <span class='ident'>util</span>::{<span class='ident'>CowCString</span>, <span class='ident'>CStringAsRef</span>};
 
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ffi</span>::{<span class='ident'>CStr</span>, <span class='ident'>OsStr</span>};
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>marker</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>Mutex</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::{<span class='ident'>fmt</span>, <span class='ident'>io</span>, <span class='ident'>marker</span>, <span class='ident'>mem</span>, <span class='ident'>ptr</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>os</span>::<span class='ident'>raw</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ptr</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>mem</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>os</span>::<span class='ident'>unix</span>::<span class='ident'>ffi</span>::<span class='ident'>OsStrExt</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>Mutex</span>;
+
+<span class='macro'>lazy_static</span><span class='macro'>!</span> {
+    <span class='kw'>static</span> <span class='kw-2'>ref</span> <span class='ident'>DLERROR_MUTEX</span>: <span class='ident'>Mutex</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Mutex</span>::<span class='ident'>new</span>(());
+}
 
 <span class='comment'>// libdl is retarded.</span>
 <span class='comment'>//</span>
@@ -336,10 +339,7 @@
 <span class='kw'>where</span> <span class='ident'>F</span>: <span class='ident'>FnOnce</span>() <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='comment'>// We will guard all uses of libdl library with our own mutex. This makes libdl</span>
     <span class='comment'>// safe to use in MT programs provided the only way a program uses libdl is via this library.</span>
-    <span class='macro'>lazy_static</span><span class='macro'>!</span> {
-        <span class='kw'>static</span> <span class='kw-2'>ref</span> <span class='ident'>MUTEX</span>: <span class='ident'>Mutex</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Mutex</span>::<span class='ident'>new</span>(());
-    }
-    <span class='kw'>let</span> <span class='ident'>_lock</span> <span class='op'>=</span> <span class='ident'>MUTEX</span>.<span class='ident'>lock</span>();
+    <span class='kw'>let</span> <span class='ident'>_lock</span> <span class='op'>=</span> <span class='ident'>DLERROR_MUTEX</span>.<span class='ident'>lock</span>();
     <span class='comment'>// While we could could call libdl here to clear the previous error value, only the dlsym</span>
     <span class='comment'>// depends on it being cleared beforehand and only in some cases too. We will instead clear the</span>
     <span class='comment'>// error inside the dlsym binding instead.</span>
@@ -361,8 +361,8 @@
             <span class='comment'>// any system that uses non-utf8 locale, so I doubt there’s a problem here.</span>
             <span class='kw'>let</span> <span class='ident'>message</span> <span class='op'>=</span> <span class='ident'>CStr</span>::<span class='ident'>from_ptr</span>(<span class='ident'>error</span>).<span class='ident'>to_string_lossy</span>().<span class='ident'>into_owned</span>();
             <span class='prelude-val'>Some</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>io</span>::<span class='ident'>ErrorKind</span>::<span class='ident'>Other</span>, <span class='ident'>message</span>))
-            <span class='comment'>// FIXME?: Since we do a copy of the error string above, maybe we should call dlerror</span>
-            <span class='comment'>// again to let libdl know it may free its copy of the string now?</span>
+            <span class='comment'>// Since we do a copy of the error string above, maybe we should call dlerror again to</span>
+            <span class='comment'>// let libdl know it may free its copy of the string now?</span>
         }
     })
 }
@@ -386,7 +386,7 @@
                     <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>f</span>) <span class='op'>=&gt;</span> <span class='ident'>f</span>.<span class='ident'>cstring_ref</span>()
                 }, <span class='ident'>flags</span>);
                 <span class='comment'>// ensure filename livess until dlopen completes</span>
-                ::<span class='ident'>std</span>::<span class='ident'>mem</span>::<span class='ident'>drop</span>(<span class='ident'>filename</span>);
+                <span class='ident'>drop</span>(<span class='ident'>filename</span>);
                 <span class='ident'>r</span>
             };
             <span class='kw'>if</span> <span class='ident'>result</span>.<span class='ident'>is_null</span>() {
@@ -475,8 +475,8 @@
     }
 }
 
-<span class='kw'>impl</span> ::<span class='ident'>std</span>::<span class='ident'>fmt</span>::<span class='ident'>Debug</span> <span class='kw'>for</span> <span class='ident'>Library</span> {
-    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> ::<span class='ident'>std</span>::<span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> ::<span class='ident'>std</span>::<span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
+<span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Debug</span> <span class='kw'>for</span> <span class='ident'>Library</span> {
+    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
         <span class='ident'>f</span>.<span class='ident'>write_str</span>(<span class='kw-2'>&amp;</span><span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;Library@{:p}&quot;</span>, <span class='self'>self</span>.<span class='ident'>handle</span>))
     }
 }
@@ -494,13 +494,14 @@
     <span class='kw'>type</span> <span class='ident'>Target</span> <span class='op'>=</span> <span class='ident'>T</span>;
     <span class='kw'>fn</span> <span class='ident'>deref</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>T</span> {
         <span class='kw'>unsafe</span> {
-            <span class='kw-2'>&amp;</span><span class='op'>*</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>pointer</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> _ <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>T</span>)
+            <span class='comment'>// Additional reference level for a dereference on `deref` return value.</span>
+            <span class='ident'>mem</span>::<span class='ident'>transmute</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>pointer</span>)
         }
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> ::<span class='ident'>std</span>::<span class='ident'>fmt</span>::<span class='ident'>Debug</span> <span class='kw'>for</span> <span class='ident'>Symbol</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> ::<span class='ident'>std</span>::<span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> ::<span class='ident'>std</span>::<span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>fmt</span>::<span class='ident'>Debug</span> <span class='kw'>for</span> <span class='ident'>Symbol</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
         <span class='kw'>unsafe</span> {
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>info</span>: <span class='ident'>DlInfo</span> <span class='op'>=</span> <span class='ident'>mem</span>::<span class='ident'>uninitialized</span>();
             <span class='kw'>if</span> <span class='ident'>dladdr</span>(<span class='self'>self</span>.<span class='ident'>pointer</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>info</span>) <span class='op'>!=</span> <span class='number'>0</span> {
@@ -547,15 +548,16 @@
 }
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>all</span>(<span class='ident'>test</span>,
-          <span class='ident'>any</span>(<span class='ident'>target_os</span><span class='op'>=</span><span class='string'>&quot;linux&quot;</span>,
-          <span class='ident'>target_os</span><span class='op'>=</span><span class='string'>&quot;freebsd&quot;</span>,
-          <span class='ident'>target_os</span><span class='op'>=</span><span class='string'>&quot;dragonfly&quot;</span>,
-          <span class='ident'>target_os</span><span class='op'>=</span><span class='string'>&quot;bitrig&quot;</span>,
-          <span class='ident'>target_os</span><span class='op'>=</span><span class='string'>&quot;netbsd&quot;</span>,
-          <span class='ident'>target_os</span><span class='op'>=</span><span class='string'>&quot;openbsd&quot;</span>)))]</span>
+          <span class='ident'>not</span>(<span class='ident'>any</span>(<span class='ident'>target_os</span><span class='op'>=</span><span class='string'>&quot;macos&quot;</span>,
+                  <span class='ident'>target_os</span><span class='op'>=</span><span class='string'>&quot;ios&quot;</span>,
+                  <span class='ident'>target_os</span><span class='op'>=</span><span class='string'>&quot;android&quot;</span>))))]</span>
 <span class='kw'>const</span> <span class='ident'>LIBM</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;libm.so.6&quot;</span>;
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>all</span>(<span class='ident'>test</span>, <span class='ident'>target_os</span><span class='op'>=</span><span class='string'>&quot;macos&quot;</span>))]</span>
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>all</span>(<span class='ident'>test</span>, <span class='ident'>target_os</span><span class='op'>=</span><span class='string'>&quot;android&quot;</span>))]</span>
+<span class='kw'>const</span> <span class='ident'>LIBM</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;libm.so&quot;</span>;
+
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>all</span>(<span class='ident'>test</span>, <span class='ident'>any</span>(<span class='ident'>target_os</span><span class='op'>=</span><span class='string'>&quot;macos&quot;</span>,
+                    <span class='ident'>target_os</span><span class='op'>=</span><span class='string'>&quot;ios&quot;</span>)))]</span>
 <span class='kw'>const</span> <span class='ident'>LIBM</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;libm.dylib&quot;</span>;
 
 <span class='attribute'>#[<span class='ident'>test</span>]</span>
@@ -629,7 +631,7 @@
 
                 <p>
                     Search functions by type signature (e.g.
-                    <code>vec -> usize</code>)
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
                 </p>
             </div>
         </div>
@@ -638,13 +640,13 @@
     
 
     <script>
-        window.rootPath = "../../../../";
+        window.rootPath = "../../../../../";
         window.currentCrate = "libloading";
         window.playgroundUrl = "";
     </script>
-    <script src="../../../../jquery.js"></script>
-    <script src="../../../../main.js"></script>
+    <script src="../../../../../jquery.js"></script>
+    <script src="../../../../../main.js"></script>
     
-    <script async src="../../../../search-index.js"></script>
+    <script defer src="../../../../../search-index.js"></script>
 </body>
 </html>

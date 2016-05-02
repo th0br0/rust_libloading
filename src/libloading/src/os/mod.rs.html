@@ -9,7 +9,9 @@
 
     <title>mod.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../../../main.css">
+    
 
     
     
@@ -40,26 +42,14 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1"> 1</span>
-<span id="2"> 2</span>
-<span id="3"> 3</span>
-<span id="4"> 4</span>
-<span id="5"> 5</span>
-<span id="6"> 6</span>
-<span id="7"> 7</span>
-<span id="8"> 8</span>
-<span id="9"> 9</span>
-<span id="10">10</span>
+    <section id='main' class="content source"><pre class="line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
 </pre><pre class='rust '>
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>any</span>(<span class='ident'>target_os</span><span class='op'>=</span><span class='string'>&quot;linux&quot;</span>,
-          <span class='ident'>target_os</span><span class='op'>=</span><span class='string'>&quot;macos&quot;</span>,
-          <span class='ident'>target_os</span><span class='op'>=</span><span class='string'>&quot;freebsd&quot;</span>,
-          <span class='ident'>target_os</span><span class='op'>=</span><span class='string'>&quot;dragonfly&quot;</span>,
-          <span class='ident'>target_os</span><span class='op'>=</span><span class='string'>&quot;bitrig&quot;</span>,
-          <span class='ident'>target_os</span><span class='op'>=</span><span class='string'>&quot;netbsd&quot;</span>,
-          <span class='ident'>target_os</span><span class='op'>=</span><span class='string'>&quot;openbsd&quot;</span>))]</span>
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>unix</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>unix</span>;
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>target_os</span><span class='op'>=</span><span class='string'>&quot;windows&quot;</span>)]</span>
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>windows</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>windows</span>;
 </pre>
 </section>
@@ -105,7 +95,7 @@
 
                 <p>
                     Search functions by type signature (e.g.
-                    <code>vec -> usize</code>)
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
                 </p>
             </div>
         </div>
@@ -114,13 +104,13 @@
     
 
     <script>
-        window.rootPath = "../../../";
+        window.rootPath = "../../../../";
         window.currentCrate = "libloading";
         window.playgroundUrl = "";
     </script>
-    <script src="../../../jquery.js"></script>
-    <script src="../../../main.js"></script>
+    <script src="../../../../jquery.js"></script>
+    <script src="../../../../main.js"></script>
     
-    <script async src="../../../search-index.js"></script>
+    <script defer src="../../../../search-index.js"></script>
 </body>
 </html>
