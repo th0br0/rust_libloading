@@ -47,12 +47,13 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-136' class='srclink' href='../../../src/libloading/src/changelog.rs.html#26' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-136' class='srclink' href='../../../src/libloading/src/changelog.rs.html#27' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Release 0.3.0 (2016-07-27)</p>
 
 <ul>
 <li>Greatly improved documentation, especially around platform-specific behaviours;</li>
 <li>Improved test suite by building our own library to test against;</li>
+<li>All <code>Library</code>-ies now implement <code>Send</code>.</li>
 <li>Added <code>impl From&lt;os::platform::Library&gt; for Library</code> and <code>impl From&lt;Library&gt; for os::platform::Library</code> allowing wrapping and extracting the platform-specific library handle;</li>
 <li>Added methods to wrap (<code>Symbol::from_raw</code>) and unwrap (<code>Symbol::into_raw</code>) the safe <code>Symbol</code>
 wrapper into unsafe <code>os::platform::Symbol</code>.</li>

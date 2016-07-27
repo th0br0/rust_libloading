@@ -49,7 +49,7 @@
                    </a>
                </span><a id='src-195' class='srclink' href='../src/libloading/src/lib.rs.html#59' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Library(_);</pre><div class='docblock'><p>A loaded dynamic library.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../libloading/struct.Library.html' title='libloading::Library'>Library</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-198' class='srclink' href='../src/libloading/src/lib.rs.html#61-158' title='goto source code'>[src]</a></span></h3>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../libloading/struct.Library.html' title='libloading::Library'>Library</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-198' class='srclink' href='../src/libloading/src/lib.rs.html#61-162' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>&lt;P:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/ffi/os_str/struct.OsStr.html' title='std::ffi::os_str::OsStr'>OsStr</a>&gt;&gt;(filename: P) -&gt; <a class='type' href='../libloading/type.Result.html' title='libloading::Result'>Result</a>&lt;<a class='struct' href='../libloading/struct.Library.html' title='libloading::Library'>Library</a>&gt;</code></h4>
 <div class='docblock'><p>Find and load a dynamic library.</p>
 
@@ -64,6 +64,10 @@
 <h2 id='platform-specific-behaviour' class='section-header'><a href='#platform-specific-behaviour'>Platform-specific behaviour</a></h2>
 <p>When a plain library filename is supplied, locations where library is searched for is
 platform specific and cannot be adjusted in a portable manner.</p>
+
+<p>Calling this function from multiple threads is not safe if used in conjunction with
+path-less filename and library search path is modified (<code>SetDllDirectory</code> function on
+Windows, <code>{DY,}LD_LIBRARY_PATH</code> environment variable on UNIX).</p>
 
 <h3 id='windows' class='section-header'><a href='#windows'>Windows</a></h3>
 <p>If the <code>filename</code> specifies a library filename without path and with extension omitted,
@@ -126,10 +130,10 @@ impossible. Using a TLS variable loaded this way on OS X is undefined behaviour.
     <span class='kw'>let</span> <span class='ident'>awesome_variable</span>: <span class='ident'>Symbol</span><span class='op'>&lt;</span><span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>f64</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>lib</span>.<span class='ident'>get</span>(<span class='string'>b&quot;awesome_variable\0&quot;</span>).<span class='ident'>unwrap</span>();
     <span class='op'>*</span><span class='op'>*</span><span class='ident'>awesome_variable</span> <span class='op'>=</span> <span class='number'>42.0</span>;
 };</pre>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../libloading/struct.Library.html' title='libloading::Library'>Library</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-209' class='srclink' href='../src/libloading/src/lib.rs.html#160-164' title='goto source code'>[src]</a></span></h3>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../libloading/struct.Library.html' title='libloading::Library'>Library</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-209' class='srclink' href='../src/libloading/src/lib.rs.html#164-168' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
 <div class='docblock'><p>Formats the value using the given formatter.</p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html' title='core::convert::From'>From</a>&lt;<a class='struct' href='../libloading/os/unix/struct.Library.html' title='libloading::os::unix::Library'>Library</a>&gt; for <a class='struct' href='../libloading/struct.Library.html' title='libloading::Library'>Library</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-213' class='srclink' href='../src/libloading/src/lib.rs.html#166-170' title='goto source code'>[src]</a></span></h3>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html' title='core::convert::From'>From</a>&lt;<a class='struct' href='../libloading/os/unix/struct.Library.html' title='libloading::os::unix::Library'>Library</a>&gt; for <a class='struct' href='../libloading/struct.Library.html' title='libloading::Library'>Library</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-213' class='srclink' href='../src/libloading/src/lib.rs.html#170-174' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.from' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html#tymethod.from' class='fnname'>from</a>(lib: <a class='struct' href='../libloading/os/unix/struct.Library.html' title='libloading::os::unix::Library'>Library</a>) -&gt; <a class='struct' href='../libloading/struct.Library.html' title='libloading::Library'>Library</a></code></h4>
 <div class='docblock'><p>Performs the conversion.</p>
 </div></div></section>

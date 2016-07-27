@@ -288,6 +288,8 @@
 <span id="244">244</span>
 <span id="245">245</span>
 <span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>util</span>::{<span class='ident'>CowCString</span>, <span class='ident'>CStringAsRef</span>};
 
@@ -344,6 +346,8 @@
 }
 
 <span class='kw'>unsafe</span> <span class='kw'>impl</span> ::<span class='ident'>std</span>::<span class='ident'>marker</span>::<span class='ident'>Send</span> <span class='kw'>for</span> <span class='ident'>Library</span> {}
+<span class='comment'>// This cannot be Sync, because with RTDL_LAZY dlsym may do relocations, which is not guaranteed to</span>
+<span class='comment'>// be thread-safe.</span>
 
 <span class='kw'>impl</span> <span class='ident'>Library</span> {
     <span class='doccomment'>/// Find and load a shared library (module).</span>
