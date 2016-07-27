@@ -47,39 +47,61 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-39' class='srclink' href='../../../src/libloading/src/os/unix/mod.rs.html#54-56' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-37' class='srclink' href='../../../src/libloading/src/os/unix/mod.rs.html#51-53' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Library {
     // some fields omitted
 }</pre><div class='docblock'><p>A platform-specific equivalent of the cross-platform <code>Library</code>.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../../../libloading/os/unix/struct.Library.html' title='libloading::os::unix::Library'>Library</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>&lt;P: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/ffi/os_str/struct.OsStr.html' title='std::ffi::os_str::OsStr'>OsStr</a>&gt;&gt;(filename: P) -&gt; <a class='type' href='../../../libloading/type.Result.html' title='libloading::Result'>Result</a>&lt;<a class='struct' href='../../../libloading/os/unix/struct.Library.html' title='libloading::os::unix::Library'>Library</a>&gt;</code></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../../../libloading/os/unix/struct.Library.html' title='libloading::os::unix::Library'>Library</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-40' class='srclink' href='../../../src/libloading/src/os/unix/mod.rs.html#57-161' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>&lt;P:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/ffi/os_str/struct.OsStr.html' title='std::ffi::os_str::OsStr'>OsStr</a>&gt;&gt;(filename: P) -&gt; <a class='type' href='../../../libloading/type.Result.html' title='libloading::Result'>Result</a>&lt;<a class='struct' href='../../../libloading/os/unix/struct.Library.html' title='libloading::os::unix::Library'>Library</a>&gt;</code></h4>
 <div class='docblock'><p>Find and load a shared library (module).</p>
 
 <p>Locations where library is searched for is platform specific and can’t be adjusted
 portably.</p>
 
-<p>Corresponds to <code>dlopen(filename)</code>.</p>
+<p>Corresponds to <code>dlopen(filename, RTLD_NOW)</code>.</p>
 </div><h4 id='method.this' class='method'><code>fn <a href='#method.this' class='fnname'>this</a>() -&gt; <a class='struct' href='../../../libloading/os/unix/struct.Library.html' title='libloading::os::unix::Library'>Library</a></code></h4>
 <div class='docblock'><p>Load the dynamic libraries linked into main program.</p>
 
 <p>This allows retrieving symbols from any <strong>dynamic</strong> library linked into the program,
 without specifying the exact library.</p>
 
-<p>Corresponds to <code>dlopen(NULL)</code>.</p>
+<p>Corresponds to <code>dlopen(NULL, RTLD_NOW)</code>.</p>
+</div><h4 id='method.open' class='method'><code>fn <a href='#method.open' class='fnname'>open</a>&lt;P&gt;(filename: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;P&gt;, flags: <a class='type' href='https://doc.rust-lang.org/nightly/std/os/raw/type.c_int.html' title='std::os::raw::c_int'>c_int</a>) -&gt; <a class='type' href='../../../libloading/type.Result.html' title='libloading::Result'>Result</a>&lt;<a class='struct' href='../../../libloading/os/unix/struct.Library.html' title='libloading::os::unix::Library'>Library</a>&gt; <span class='where'>where P: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/ffi/os_str/struct.OsStr.html' title='std::ffi::os_str::OsStr'>OsStr</a>&gt;</span></code></h4>
+<div class='docblock'><p>Find and load a shared library (module).</p>
+
+<p>Locations where library is searched for is platform specific and can’t be adjusted
+portably.</p>
+
+<p>If the <code>filename</code> is None, null pointer is passed to <code>dlopen</code>.</p>
+
+<p>Corresponds to <code>dlopen(filename, flags)</code>.</p>
 </div><h4 id='method.get' class='method'><code>unsafe fn <a href='#method.get' class='fnname'>get</a>&lt;T&gt;(&amp;self, symbol: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; <a class='type' href='../../../libloading/type.Result.html' title='libloading::Result'>Result</a>&lt;<a class='struct' href='../../../libloading/os/unix/struct.Symbol.html' title='libloading::os::unix::Symbol'>Symbol</a>&lt;T&gt;&gt;</code></h4>
-<div class='docblock'><p>Get a symbol by name.</p>
+<div class='docblock'><p>Get a pointer to function or static variable by symbol name.</p>
 
-<p>Mangling or symbol rustification is not done: trying to <code>get</code> something like <code>x::y</code>
-will not work.</p>
+<p>The <code>symbol</code> may not contain any null bytes, with an exception of last byte. A null
+terminated <code>symbol</code> may avoid a string allocation in some cases.</p>
 
-<p>You may append a null byte at the end of the byte string to avoid string allocation in some
-cases. E.g. for symbol <code>sin</code> you may write <code>b&quot;sin\0&quot;</code> instead of <code>b&quot;sin&quot;</code>.</p>
+<p>Symbol is interpreted as-is; no mangling is done. This means that symbols like <code>x::y</code> are
+most likely invalid.</p>
 
-<h1 id='unsafety' class='section-header'><a href='#unsafety'>Unsafety</a></h1>
-<p>Symbol of arbitrary requested type is returned. Using a symbol with wrong type is not
-memory safe.</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../../../libloading/os/unix/struct.Library.html' title='libloading::os::unix::Library'>Library</a></code></h3><div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
-</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../../libloading/os/unix/struct.Library.html' title='libloading::os::unix::Library'>Library</a></code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
-</div></section>
+<h2 id='unsafety' class='section-header'><a href='#unsafety'>Unsafety</a></h2>
+<p>Pointer to a value of arbitrary type is returned. Using a value with wrong type is
+undefined.</p>
+
+<h2 id='platform-specific-behaviour' class='section-header'><a href='#platform-specific-behaviour'>Platform-specific behaviour</a></h2>
+<p>OS X uses some sort of lazy initialization scheme, which makes loading TLS variables
+impossible. Using a TLS variable loaded this way on OS X is undefined behaviour.</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> for <a class='struct' href='../../../libloading/os/unix/struct.Library.html' title='libloading::os::unix::Library'>Library</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-39' class='srclink' href='../../../src/libloading/src/os/unix/mod.rs.html#55' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../../../libloading/os/unix/struct.Library.html' title='libloading::os::unix::Library'>Library</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-75' class='srclink' href='../../../src/libloading/src/os/unix/mod.rs.html#163-171' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
+<div class='docblock'><p>A method called when the value goes out of scope. <a href="https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop">Read more</a></p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../../libloading/os/unix/struct.Library.html' title='libloading::os::unix::Library'>Library</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-79' class='srclink' href='../../../src/libloading/src/os/unix/mod.rs.html#173-177' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+<div class='docblock'><p>Formats the value using the given formatter.</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html' title='core::convert::From'>From</a>&lt;<a class='struct' href='../../../libloading/struct.Library.html' title='libloading::Library'>Library</a>&gt; for <a class='struct' href='../../../libloading/os/unix/struct.Library.html' title='libloading::os::unix::Library'>Library</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-216' class='srclink' href='../../../src/libloading/src/lib.rs.html#172-176' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.from' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html#tymethod.from' class='fnname'>from</a>(lib: <a class='struct' href='../../../libloading/struct.Library.html' title='libloading::Library'>Library</a>) -&gt; <a class='struct' href='../../../libloading/os/unix/struct.Library.html' title='libloading::os::unix::Library'>Library</a></code></h4>
+<div class='docblock'><p>Performs the conversion.</p>
+</div></div></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
@@ -102,6 +124,8 @@ memory safe.</p>
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 

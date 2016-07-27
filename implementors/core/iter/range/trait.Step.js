@@ -1,5 +1,5 @@
 (function() {var implementors = {};
-implementors['libloading'] = [];
+implementors["lazy_static"] = [];implementors["libloading"] = [];
 
             if (window.register_implementors) {
                 window.register_implementors(implementors);
